@@ -34,13 +34,15 @@
 
 void printUserInputHelper()
 {
+    printf("\x1b[H\x1b[J");
+
     puts("Hey you! Yes you! This is a chess game!");
   
     puts("Before you start here is a short tutorial on how to add your moves.");
    
     puts("You ought to follow the format:");
 
-    puts("Example moving the queen: Queen d8 d7\n");
+    puts("Example moving the queen: Queen d8 d7");
 
     puts("Example moving the king: King e8 e7");
 
@@ -52,7 +54,58 @@ void printUserInputHelper()
 
     puts("Example moving the knight: Knight a8 a3");
 
-    printf("\n\n");
+    printf("\n");
+}
+
+void ExitGame()
+{
+    exit(EXIT_SUCCESS);
+}
+
+void Tutorial()
+{
+    char tutorialUserInput;
+	
+	bool waitForMenuCompletion = true;
+
+	//call the init board fct in order to set the initial settings of the board
+
+	// printf("%u", waitForMenuCompletion);
+
+	while(waitForMenuCompletion)
+	{
+		printUserInputHelper();
+
+		printf("Press 1 to continue the game, 0 to exit: ");
+
+		if(scanf("%c", &tutorialUserInput) == 1)
+		{
+			switch (tutorialUserInput)
+			{
+				case '0':
+				{
+					ExitGame();
+					break;
+				}
+
+				case '1':
+				{
+					waitForMenuCompletion = false;
+					break;
+				}
+			
+				default:
+				{
+					waitForMenuCompletion = true;
+					break;
+				}
+			}
+		}
+		else
+		{
+			waitForMenuCompletion = true;
+		}
+	}
 }
 
 #endif //we end the declaration of the chess pieces

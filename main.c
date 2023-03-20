@@ -9,6 +9,7 @@
 #include <locale.h>
 #include <wchar.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "checkMoves.h"
 
@@ -134,21 +135,10 @@ void gamePlay()
 
 	unsigned int movement = WHITE;
 
-	unsigned int waitForMenuCompletion = -1;
-	
-	//call the init board fct in order to set the initial settings of the board
-	
-	printUserInputHelper();
-
-	while(waitForMenuCompletion != -1)
-	{
-		puts("Feel prepared? Press 1 to continue, 0 to exit: ");
-
-		
-	}
+	Tutorial();
 
 	initBoard();
-	
+
 	while(!endOfTheLine)
 	{
 		//we print the chess chess_board
