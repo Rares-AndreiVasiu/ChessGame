@@ -18,7 +18,7 @@ char option[10];
 
 void print_chess_board()
 {
-	printf("\x1b[H\x1b[J");
+	// printf("\x1b[H\x1b[J");
 
 	//chess_board coordinates
 	printf("  ");
@@ -101,6 +101,8 @@ void gamePlay()
             printf("%s's turn.", (movement == WHITE) ? "WHITE" : "BLACK");
 
             flag = movementHandler(movement);
+
+			printf("FLAG IS: %d\n", flag);
         }
 
 		if(movement == 1)

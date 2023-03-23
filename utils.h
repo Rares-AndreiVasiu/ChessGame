@@ -28,6 +28,10 @@
 //declare the chess board at this point
 unsigned int chess_board[9][9];
 
+unsigned int whitePawnsStart[9];
+
+unsigned int blackPawnsStart[9];
+
 void initBoard()
 {
 	/*
@@ -78,6 +82,13 @@ void initBoard()
 	for(int i = 1; i <= 8; ++ i)
 	{
 		chess_board[7][i] = white_PAWN;
+	}
+
+	for(int i = 1; i <= 8; ++ i)
+	{
+		whitePawnsStart[i] = 1;
+		
+		blackPawnsStart[i] = 1;
 	}
 }
 
