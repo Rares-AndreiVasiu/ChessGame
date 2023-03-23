@@ -9,66 +9,12 @@
 #include <locale.h>
 #include <wchar.h>
 #include <stdint.h>
+#include <string.h>
 #include <stdbool.h>
 
 #include "checkMoves.h"
 
-unsigned int chess_board[9][9];
-
 char option[10];
-
-void initBoard()
-{
-	/*
-		chess chess_board initialization
-	*/
-
-	chess_board[1][1] = black_ROOK;
-
-	chess_board[1][2] = black_KNIGHT;
-	
-	chess_board[1][3] = black_BISHOP;
-	
-	chess_board[1][4] = black_QUEEN;
-	
-	chess_board[1][5] = black_KING;
-	
-	chess_board[1][6] = black_BISHOP;
-	
-	chess_board[1][7] = black_KNIGHT;
-	
-	chess_board[1][8] = black_ROOK;
-
-	/*
-		init chess board with its pieces
-	*/
-
-	for(int i = 1; i <= 8; ++i)
-	{
-		chess_board[2][i] = black_PAWN;
-	}
-
-	chess_board[8][1] = white_ROOK;
-
-	chess_board[8][2] = white_KNIGHT;
-	
-	chess_board[8][3] = white_BISHOP;
-	
-	chess_board[8][4] = white_QUEEN;
-	
-	chess_board[8][5] = white_KING;
-	
-	chess_board[8][6] = white_BISHOP;
-	
-	chess_board[8][7] = white_KNIGHT;
-	
-	chess_board[8][8] = white_ROOK;
-
-	for(int i = 1; i <= 8; ++ i)
-	{
-		chess_board[7][i] = white_PAWN;
-	}
-}
 
 void print_chess_board()
 {
@@ -142,17 +88,20 @@ void gamePlay()
 	while(!endOfTheLine)
 	{
 		//we print the chess chess_board
-		print_chess_board();
 
-		//require for input from user
-		printf("%s's turn.", (movement == WHITE) ? "WHITE" : "BLACK");
+        bool flag = false;
 
-		//we call this function in order to guide the user
-		//to acknoledge the format of its input
+        print_chess_board();
+        
+        while(!flag)
+        {
+            printf("\n");
 
-		//take user input with scanf
-		//further checking required	
-		scanf("%9s", option);
+            //require for input from user
+            printf("%s's turn.", (movement == WHITE) ? "WHITE" : "BLACK");
+
+            flag = movementHandler(movement);
+        }
 
 		if(movement == 1)
 		{
