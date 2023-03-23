@@ -18,12 +18,68 @@
 #define white_BISHOP 0x265D
 #define white_KNIGHT 0x265E
 #define white_PAWN   0x265F
-        
+
 #define black_SQUARE 0x25A0
 #define white_SQUARE 0x25A1
-        
+
 #define WHITE 0
 #define BLACK 1
+
+//declare the chess board at this point
+unsigned int chess_board[9][9];
+
+void initBoard()
+{
+	/*
+		chess chess_board initialization
+	*/
+
+	chess_board[1][1] = black_ROOK;
+
+	chess_board[1][2] = black_KNIGHT;
+	
+	chess_board[1][3] = black_BISHOP;
+	
+	chess_board[1][4] = black_QUEEN;
+	
+	chess_board[1][5] = black_KING;
+	
+	chess_board[1][6] = black_BISHOP;
+	
+	chess_board[1][7] = black_KNIGHT;
+	
+	chess_board[1][8] = black_ROOK;
+
+	/*
+		init chess board with its pieces
+	*/
+
+	for(int i = 1; i <= 8; ++i)
+	{
+		chess_board[2][i] = black_PAWN;
+	}
+
+	chess_board[8][1] = white_ROOK;
+
+	chess_board[8][2] = white_KNIGHT;
+	
+	chess_board[8][3] = white_BISHOP;
+	
+	chess_board[8][4] = white_QUEEN;
+	
+	chess_board[8][5] = white_KING;
+	
+	chess_board[8][6] = white_BISHOP;
+	
+	chess_board[8][7] = white_KNIGHT;
+	
+	chess_board[8][8] = white_ROOK;
+
+	for(int i = 1; i <= 8; ++ i)
+	{
+		chess_board[7][i] = white_PAWN;
+	}
+}
 
 
 /*
