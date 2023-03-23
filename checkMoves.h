@@ -571,7 +571,4 @@ bool movementHandler(unsigned int movement)
         return false;
     }
 }
-
-
-
 #endif
