@@ -73,12 +73,91 @@ bool checkInitialPosition(const char *pos, const char *piceType, unsigned int mo
     }
 }
 
+/*
+    check if a block from the board is empty
+    returns true if board[i][j] == 0, false otherwise;
+*/
+bool checkEmptyBlock(int i, int j)
+{
+    if(chess_board[i][j] == 0)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+//returns true if you can step on an enemy piece, false otherwise
+bool checkNotAllay(int Xi, int Yi, int Xf, int Yf)
+{
+    int piece = chess_board[Xi][Yi];
+
+    if (piece == white_KNIGHT || piece == white_KING || piece == white_QUEEN 
+    || piece == white_ROOK || piece == white_PAWN || piece == white_BISHOP)
+    {
+        int targetPiece = chess_board[Xf][Yf];
+
+        if (targetPiece == black_PAWN || targetPiece == black_KNIGHT || targetPiece == black_BISHOP 
+        || targetPiece == black_ROOK || targetPiece == black_QUEEN || targetPiece == black_KING)
+        {
+            return true;
+        }
+    }
+    else
+    {
+        if (piece == black_PAWN || piece == black_KNIGHT || piece == black_BISHOP || piece == black_ROOK 
+        || piece == black_QUEEN || piece == black_KING)
+        {
+            int targetPiece = chess_board[Xf][Yf];
+
+            if (targetPiece == white_KNIGHT || targetPiece == white_KING || targetPiece == white_QUEEN 
+            || targetPiece == white_ROOK || targetPiece == white_PAWN || targetPiece == white_BISHOP)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+/*
+    function which checks if we get check mate
+*/
+bool checkGameCheck(int Xi, int Yi, int Xf, int Yf)
+{
+    int targetBlock = chess_board[Xf][Yf];
+
+    //we check horrizontally for threats
+    if(Xi == Xf)
+    {
+
+    }
+}
+
 //the following function checks if you can move the king to finPos
 bool checkKingMovement(const char *initialPosition, const char *finalPosition)
 {
     printf("POWER KING\n");
 
-    return true;
+    bool validKingMove = true;
+
+    int XInitialCoordinate = (initialPosition[1] - '0');
+    int YInitialCoordinate = (initialPosition[0] - 'a') + 1;
+
+    int XFinalCoordinate = (finalPosition[1] - '0');
+    int YFinalCoordinate = (finalPosition[0] - 'a') + 1;
+
+    if( (XFinalCoordinate <= 8 && XFinalCoordinate >= 1) && (YFinalCoordinate <= 8 && YInitialCoordinate >= 1) &&
+    abs(XInitialCoordinate - XFinalCoordinate) <= 1 && abs(YFinalCoordinate - YInitialCoordinate) <= 1)
+    {
+
+    }
+    else
+    {
+        validKingMove = false;
+    }
+
 }
 
 //the following function checks if you can move the queen to finPos
@@ -86,13 +165,293 @@ bool checkQueenMovement(const char *initialPosition, const char *finalPosition)
 {
     printf("POWER QUEEN\n");
 
-    return true;
-}
+    int XInitialCoordinate = (initialPosition[1] - '0');
+    int YInitialCoordinate = (initialPosition[0] - 'a') + 1;
 
-//check if a block from the board is empty
-bool checkEmptyBlock(int i, int j)
-{
-    return chess_board[i][j] == 0;
+    int XFinalCoordinate = (finalPosition[1] - '0');
+    int YFinalCoordinate = (finalPosition[0] - 'a') + 1;
+
+    if ( ( (abs(XInitialCoordinate - XFinalCoordinate) == abs(YInitialCoordinate - YFinalCoordinate)) 
+        || (XInitialCoordinate == XFinalCoordinate || YFinalCoordinate == YInitialCoordinate) )
+        && ( (XFinalCoordinate <= 8 && XFinalCoordinate >= 1) && (YFinalCoordinate <= 8 && YInitialCoordinate >= 1) ) )
+    {
+        bool validQueenMove = true;
+
+        // we check if queen moves horrizontally
+        if (XInitialCoordinate == XFinalCoordinate)
+        {
+            if (YInitialCoordinate < YFinalCoordinate) // we move right
+            {
+                puts("WE move to the right!");
+
+                for (int j = YInitialCoordinate + 1; j <= YFinalCoordinate && validQueenMove; ++j)
+                {
+                    if (checkEmptyBlock(XInitialCoordinate, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, XInitialCoordinate, j) == false) //if we have an allay on path
+                    {
+                        validQueenMove = false;
+                        break;
+                    }
+                    else
+                    {
+                        if(checkEmptyBlock(XInitialCoordinate, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, XInitialCoordinate, j) == true
+                        && j != YFinalCoordinate) //if we have a enemy piece on path but not at destination
+                        {
+                            validQueenMove = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                puts("We move to the left");
+                // move to the left
+                for (int j = YInitialCoordinate - 1; j >= YFinalCoordinate && validQueenMove; --j)
+                {
+                    if (checkEmptyBlock(XInitialCoordinate, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, XInitialCoordinate, j) == false)
+                    {
+                        validQueenMove = false;
+                        break;
+                    }
+                    else
+                    {
+                        if(checkEmptyBlock(XInitialCoordinate, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, XInitialCoordinate, j) == true &&
+                        j != YFinalCoordinate)
+                        {
+                            validQueenMove = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            // check if we move vertically
+            if (YInitialCoordinate == YFinalCoordinate)
+            {
+                printf("We move vertically\n");
+                // now we check for clear road
+
+                if (XInitialCoordinate < XFinalCoordinate) // check if we move downwards
+                {
+                    puts("We move downwards!");
+
+                    // we move more than 1 block on the chess board
+                    for (int i = XInitialCoordinate + 1; i <= XFinalCoordinate && validQueenMove; ++i)
+                    {
+                        if (checkEmptyBlock(i, YInitialCoordinate) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, YInitialCoordinate) == false)
+                        {
+                            printf("Here is not empty: %d %d\n", i, YInitialCoordinate);
+
+                            validQueenMove = false;
+                            break;
+                        }
+                        else
+                        {
+                            if(checkEmptyBlock(i, YInitialCoordinate) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, YInitialCoordinate) == true &&
+                            i != XFinalCoordinate)
+                            {
+                                validQueenMove = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    puts("We move upwards!");
+
+                    for (int i = XInitialCoordinate - 1; i >= XFinalCoordinate && validQueenMove; --i)
+                    {
+                        if (checkEmptyBlock(i, YInitialCoordinate) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, YInitialCoordinate) == false)
+                        {
+                            printf("Here is not empty: %d %d\n", i, YInitialCoordinate);
+
+                            validQueenMove = false;
+
+                            break;
+                        }
+                        else
+                        {
+                            if(checkEmptyBlock(i, YInitialCoordinate) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, YInitialCoordinate) == true &&
+                            i != XFinalCoordinate)
+                            {
+                                validQueenMove = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // check if we move on diagonals
+
+                /*
+                    We have 4 cases
+                        =>  1-st quadrant: x1 > x2, y1 < y2
+                */
+
+                if (XInitialCoordinate > XFinalCoordinate && YInitialCoordinate < YFinalCoordinate)
+                {
+                    puts("We are in case 1!");
+
+                    int i = XInitialCoordinate - 1;
+
+                    int j = YInitialCoordinate + 1;
+
+                    while (i >= XFinalCoordinate && j <= YFinalCoordinate)
+                    {
+                        if (checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == false)
+                        {
+                            printf("Here is not empty: %d %d\n", i, j);
+
+                            validQueenMove = false;
+
+                            break;
+                        }
+                        else
+                        {
+                            if(checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == true && 
+                            i != XFinalCoordinate && j != YFinalCoordinate)
+                            {
+                                validQueenMove = false;
+
+                                break;
+                            }
+                        }
+
+                        i--;
+                        j++;
+
+                    }
+                }
+                else
+                {
+                    /*
+                            => 2-st quadrant: x1 > x2, y1 > y2
+                    */
+                    if (XInitialCoordinate > XFinalCoordinate && YInitialCoordinate > YFinalCoordinate)
+                    {
+                        puts("We are in case 2!");
+
+                        int i = XInitialCoordinate - 1;
+
+                        int j = YInitialCoordinate - 1;
+
+                        while(i >= XFinalCoordinate && j >= YFinalCoordinate)
+                        {
+                            if(checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == false)
+                            {
+                                printf("Here is not empty: %d %d\n", i, j);
+
+                                validQueenMove = false;
+                                
+                                break;
+                            }
+                            else
+                            {
+                                if(checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == true &&
+                                i != XFinalCoordinate && j != YFinalCoordinate)
+                                {
+                                    validQueenMove = false;
+                                    break;
+                                }
+                            }
+
+                            i--;
+                            j--;
+                        }
+                    }
+                    else
+                    {
+                        /*
+                                => 3-rd quadrant: x1 < x2, y1 > y2
+                        */
+
+                        if (XInitialCoordinate < XFinalCoordinate && YInitialCoordinate > YFinalCoordinate)
+                        {
+                            int i = XInitialCoordinate + 1;
+
+                            int j = YInitialCoordinate - 1;
+
+                            while (i <= XFinalCoordinate && j >= YFinalCoordinate)
+                            {
+                                if (checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == false)
+                                {
+                                    printf("Here is not empty: %d %d\n", i, j);
+
+                                    validQueenMove = false;
+
+                                    break;
+                                }
+                                else
+                                {
+                                    if(checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == true && 
+                                    i != XFinalCoordinate && j != YFinalCoordinate)
+                                    {
+                                        validQueenMove = false;
+                                        
+                                        break;
+                                    }
+                                }
+
+                                i++;
+                                j--;
+                            }
+                        }
+
+                        else
+                        {
+                            /*
+                                => 4-th quadrant: x1 < x2, y1 < y2
+                            */
+
+                            if (XInitialCoordinate < XFinalCoordinate && YInitialCoordinate < YFinalCoordinate)
+                            {
+                                int i = XInitialCoordinate + 1;
+
+                                int j = YInitialCoordinate + 1;
+
+                                while (i <= XFinalCoordinate && j <= YFinalCoordinate)
+                                {
+                                    if (checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == false)
+                                    {
+                                        printf("Here is not empty: %d %d\n", i, j);
+
+                                        validQueenMove = false;
+
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        if(checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == true &&
+                                        i != XFinalCoordinate && j != YFinalCoordinate)
+                                        {
+                                            validQueenMove = false;
+
+                                            break;
+                                        }
+                                    }
+
+                                    i++;
+
+                                    j++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return validQueenMove;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 //the following function checks if you can move the rook to finPos
@@ -113,81 +472,379 @@ bool checkRookMovement(const char *initialPosition, const char *finalPosition)
     int XFinalCoordinate = (finalPosition[1] - '0');
     int YFinalCoordinate = (finalPosition[0] - 'a') + 1;
 
-    bool validMove = true; 
+    bool validMove = true;
 
-    //first check to move online horiz
-    if(XInitialCoordinate == XFinalCoordinate)
+    if ( (XFinalCoordinate <= 8 && XFinalCoordinate >= 1) && (YFinalCoordinate <= 8 && YInitialCoordinate >= 1) )
     {
-        printf("We move horrizontally\n");
+        // first check to move online horizontally
+        if (XInitialCoordinate == XFinalCoordinate)
+        {
+            printf("We move horrizontally\n");
 
-        //now to check for clear road
-        if(YInitialCoordinate < YFinalCoordinate)
-        {
-            for(int j = YInitialCoordinate + 1; j <= YFinalCoordinate && validMove; ++ j)
+            // now to check for clear road
+            if (YInitialCoordinate < YFinalCoordinate)
             {
-                if(!checkEmptyBlock(XInitialCoordinate, j))
-                {
-                    validMove = false;
-                }
-            }
-        }
-        else
-        {
-            for(int j = YInitialCoordinate - 1; j >= YFinalCoordinate && validMove; -- j)
-            {
-                if(!checkEmptyBlock(XInitialCoordinate, j))
-                {
-                    validMove = false;
-                }
-            }
-        }
-    }
-    else
-    {
-        if(YInitialCoordinate == YFinalCoordinate)
-        {
-            printf("We move vertically\n");
-            //now we check for clear road
+                puts("We move to the right!");
 
-            if(XInitialCoordinate < XFinalCoordinate)
-            {
-                for(int i = XInitialCoordinate + 1; i <= XFinalCoordinate && validMove; ++ i)
+                for (int j = YInitialCoordinate + 1; j <= YFinalCoordinate && validMove; ++j)
                 {
-                    if(!checkEmptyBlock(i, YInitialCoordinate))
+                    if (checkEmptyBlock(XInitialCoordinate, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, j) == false)
                     {
-                        printf("Here is not empty: %d %d\n", i, YInitialCoordinate);
+                        printf("Here is not empty: %d %d\n", XInitialCoordinate, j);
+                        
                         validMove = false;
+                    }
+                    else
+                    {
+                        if(checkEmptyBlock(XInitialCoordinate, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, j) == true &&
+                        j != YFinalCoordinate)
+                        {
+                            validMove = false;
+                        }
                     }
                 }
             }
             else
             {
-                for(int i = XInitialCoordinate - 1; i >= XFinalCoordinate && validMove; -- i)
+                puts("We move to the left!");
+
+                for (int j = YInitialCoordinate - 1; j >= YFinalCoordinate && validMove; --j)
                 {
-                    if(!checkEmptyBlock(i, YInitialCoordinate))
+                    if (checkEmptyBlock(XInitialCoordinate, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, j) == false)
                     {
-                        printf("Here is not empty: %d %d\n", i, YInitialCoordinate);
+                        printf("Here is not empty: %d %d\n", XInitialCoordinate, j);
+                        
                         validMove = false;
+                    }
+                    else
+                    {
+                        if(checkEmptyBlock(XInitialCoordinate, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, j) == true &&
+                        j != YFinalCoordinate)
+                        {
+                            validMove = false;
+                        }
                     }
                 }
             }
         }
         else
         {
-            validMove = false;
-        }   
+            if (YInitialCoordinate == YFinalCoordinate)
+            {
+                // now we check for clear road
+
+                if (XInitialCoordinate < XFinalCoordinate)
+                {
+                    printf("We move down vertically\n");
+
+                    for (int i = XInitialCoordinate + 1; i <= XFinalCoordinate && validMove; ++i)
+                    {
+                        if (checkEmptyBlock(i, YInitialCoordinate) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, YInitialCoordinate) == false)
+                        {
+                            printf("Here is not empty: %d %d\n", i, YInitialCoordinate);
+
+                            validMove = false;
+                        }
+                        else
+                        {
+                            if(checkEmptyBlock(i, YInitialCoordinate) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, YInitialCoordinate) == true &&
+                            i != XFinalCoordinate)
+                            {
+                                validMove = false;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    puts("We move up vertically!");
+
+                    for (int i = XInitialCoordinate - 1; i >= XFinalCoordinate && validMove; --i)
+                    {
+                        if (checkEmptyBlock(i, YInitialCoordinate) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, YInitialCoordinate) == false)
+                        {
+                            printf("Here is not empty: %d %d\n", i, YInitialCoordinate);
+
+                            validMove = false;
+                        }
+                        else
+                        {
+                            if(checkEmptyBlock(i, YInitialCoordinate) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, YInitialCoordinate) == true &&
+                            i != XFinalCoordinate)
+                            {
+                                validMove = false;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                validMove = false;
+            }
+        }
+    }
+    else
+    {
+        validMove = false;
     }
 
     return validMove;
 }
-
 
 //the following function checks if you can move the king to finPos
 bool checkBishopMovement(const char *initialPosition, const char *finalPosition)
 {
     printf("POWER BISHOP\n");
 
-    return true;
+    int XInitialCoordinate = (initialPosition[1] - '0');
+    int YInitialCoordinate = (initialPosition[0] - 'a') + 1;
+
+    int XFinalCoordinate = (finalPosition[1] - '0');
+    int YFinalCoordinate = (finalPosition[0] - 'a') + 1;
+
+    bool validBishopMove = true;
+
+    bool flagCase = false;
+
+    if ((abs(XInitialCoordinate - XFinalCoordinate) == abs(YInitialCoordinate - YFinalCoordinate)) && ((XFinalCoordinate <= 8 && XFinalCoordinate >= 1) && (YFinalCoordinate <= 8 && YInitialCoordinate >= 1)))
+    {
+        // check if we move on diagonals
+
+        /*
+            We have 4 cases
+                =>  1-st quadrant: x1 < x2, y1 > y2
+        */
+
+        //we need to separate this case into white stepping bishops and black stepping bishops
+        
+        int bishopColour = -1;
+
+        if(chess_board[XInitialCoordinate][YInitialCoordinate] == white_BISHOP)
+        {
+            bishopColour = WHITE;
+        }
+        
+        if(chess_board[XInitialCoordinate][YInitialCoordinate] == black_BISHOP)
+        {
+            bishopColour = BLACK;
+        }
+
+        if (XInitialCoordinate > XFinalCoordinate && YInitialCoordinate < YFinalCoordinate)
+        {
+            /*
+                    => first quadrant: x1 > x2, y1 < y2
+            */
+
+            puts("We are in case 1!");
+
+            int i = XInitialCoordinate - 1;
+
+            int j = YInitialCoordinate + 1;
+
+            while (i >= XFinalCoordinate && j <= YFinalCoordinate)
+            {
+                if (checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == false)
+                {
+                    printf("Here is not empty: %d %d\n", i, j);
+
+                    validBishopMove = false;
+
+                    break;
+                }
+                else
+                {
+                    if(checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == true && 
+                    i != XFinalCoordinate && j != YFinalCoordinate)
+                    {
+                        validBishopMove = false;
+
+                        break;
+                    }
+                }
+
+                if ((chess_board[i][j] == white_SQUARE && WHITE != bishopColour) || (chess_board[i][j] == black_SQUARE && BLACK != bishopColour))
+                {
+                    printf("Here is not matching block: %d %d\n", i, j);
+
+                    validBishopMove = false;
+
+                    break;
+                }
+
+                i--;
+
+                j++;
+            }
+            flagCase = true;
+        }
+        else
+        {
+            /*
+                    => 2-st quadrant: x1 > x2, y1 > y2
+            */
+            if (XInitialCoordinate > XFinalCoordinate && YInitialCoordinate > YFinalCoordinate)
+            {
+                puts("We are in case 2!");
+
+                int i = XInitialCoordinate - 1;
+
+                int j = YInitialCoordinate - 1;
+
+                while (i >= XFinalCoordinate && j >= YFinalCoordinate)
+                {
+                    if (checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == false)
+                    {
+                        printf("Here is not empty: %d %d\n", i, j);
+
+                        validBishopMove = false;
+
+                        break;
+                    }
+                    else
+                    {
+                        if(checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == true &&
+                        i != XFinalCoordinate && j != YFinalCoordinate)
+                        {
+                            validBishopMove = false;
+
+                            break;
+                        }
+                    }
+
+                    if ((chess_board[i][j] == white_SQUARE && WHITE != bishopColour) || (chess_board[i][j] == black_SQUARE && BLACK != bishopColour))
+                    {
+                        printf("Here is not matching block: %d %d\n", i, j);
+
+                        validBishopMove = false;
+
+                        break;
+                    }
+                    flagCase = true;
+
+                    i--;
+
+                    j--;
+                }
+            }
+            else
+            {
+                /*
+                        => 3-rd quadrant: x1 < x2, y1 > y2
+                */
+
+                if (XInitialCoordinate < XFinalCoordinate && YInitialCoordinate > YFinalCoordinate)
+                {
+                    int i = XInitialCoordinate + 1;
+
+                    int j = YInitialCoordinate - 1;
+
+                    while (i <= XFinalCoordinate && j >= YFinalCoordinate)
+                    {
+                        if (checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == false)
+                        {
+                            printf("Here is not empty: %d %d\n", i, j);
+
+                            validBishopMove = false;
+
+                            break;
+                        }
+                        else
+                        {
+                            if(checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == true &&
+                            i != XFinalCoordinate && j != YFinalCoordinate)
+                            {
+                                validBishopMove = false;
+
+                                break;
+                            }
+                        }
+
+                        if ((chess_board[i][j] == white_SQUARE && WHITE != bishopColour) || (chess_board[i][j] == black_SQUARE && BLACK != bishopColour))
+                        {
+                            printf("Here is not matching block: %d %d\n", i, j);
+
+                            validBishopMove = false;
+
+                            break;
+                        }
+
+                        flagCase = true;
+
+                        i++;
+
+                        j--;
+                    }
+                }
+
+                else
+                {
+                    /*
+                        => 4-th quadrant: x1 < x2, y1 < y2
+                    */
+
+                    if (XInitialCoordinate < XFinalCoordinate && YInitialCoordinate < YFinalCoordinate)
+                    {
+                        int i = XInitialCoordinate + 1;
+
+                        int j = YInitialCoordinate + 1;
+
+                        while (i <= XFinalCoordinate && j <= YFinalCoordinate)
+                        {
+                            if (checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == false)
+                            {
+                                printf("Here is not empty: %d %d\n", i, j);
+
+                                validBishopMove = false;
+
+                                break;
+                            }
+                            else
+                            {
+                                if(checkEmptyBlock(i, j) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, i, j) == true &&
+                                i != XFinalCoordinate && j != YFinalCoordinate)
+                                {
+                                    validBishopMove = false;
+
+                                    break;
+                                }
+                            }
+
+                            if ((chess_board[i][j] == white_SQUARE && WHITE != bishopColour) || (chess_board[i][j] == black_SQUARE && BLACK != bishopColour))
+                            {
+                                printf("Here is not matching block: %d %d\n", i, j);
+
+                                validBishopMove = false;
+
+                                break;
+                            }
+                            
+                            flagCase = true;
+
+                            i++;
+
+                            j++;
+                        }
+                    }
+                    else
+                    {
+                        validBishopMove = false;
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        validBishopMove = false;
+    }
+
+    if(!flagCase)
+    {
+        validBishopMove = false;
+    }
+
+    return validBishopMove;
 }
 
 bool checkKnightMovement(const char *initialPosition, const char *finalPosition)
@@ -200,111 +857,21 @@ bool checkKnightMovement(const char *initialPosition, const char *finalPosition)
     int XFinalCoordinate = (finalPosition[1] - '0');
     int YFinalCoordinate = (finalPosition[0] - 'a') + 1;
 
-
-    if( ( ( abs(XInitialCoordinate - XFinalCoordinate) == 1) && ( abs(YFinalCoordinate - YInitialCoordinate) == 2)) 
-     || ( ( abs(XFinalCoordinate - XInitialCoordinate) == 2) && ( abs(YFinalCoordinate - YInitialCoordinate) == 1)) )
+    if ( (XFinalCoordinate <= 8 && XFinalCoordinate >= 1) && (YFinalCoordinate <= 8 && YInitialCoordinate >= 1) 
+        && ( ( ( abs(XInitialCoordinate - XFinalCoordinate) == 1) && ( abs(YFinalCoordinate - YInitialCoordinate) == 2)) 
+        || ( ( abs(XFinalCoordinate - XInitialCoordinate) == 2) && ( abs(YFinalCoordinate - YInitialCoordinate) == 1)) ) )
     {
-        int colorKnight = chess_board[XInitialCoordinate][YInitialCoordinate];
-
-        if(colorKnight == white_KNIGHT)
+        if(checkEmptyBlock(XFinalCoordinate, YFinalCoordinate) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, YFinalCoordinate) == false)
         {
-            switch(chess_board[XFinalCoordinate][XInitialCoordinate])
-            {
-                case white_KING:
-                {
-                    return false;
-                    break;
-                }
-
-                case white_QUEEN:
-                {
-                    return false;
-                    break;
-                }
-
-                case white_ROOK:
-                {
-                    return false;
-                    break;
-                }
-
-                case white_BISHOP:
-                {
-                    return false;
-                    break;
-                }
-
-                case white_KNIGHT:
-                {
-                    return false;
-                    break;
-                }
-
-                case white_PAWN:
-                {
-                    return false;
-                    break;
-                }
-                default:
-                {
-                    return true;
-                    break;
-                }
-            }
-        }
-        else
-        {
-            if(colorKnight == black_KNIGHT)
-            {
-                //knight is black 
-                switch(chess_board[XFinalCoordinate][XInitialCoordinate])
-                {
-                    case black_KING:
-                    {
-                        return false;
-                        break;
-                    }
-
-                    case black_QUEEN:
-                    {
-                        return false;
-                        break;
-                    }
-
-                    case black_ROOK:
-                    {
-                        return false;
-                        break;
-                    }
-
-                    case black_BISHOP:
-                    {
-                        return false;
-                        break;
-                    }
-
-                    case black_KNIGHT:
-                    {
-                        return false;
-                        break;
-                    }
-
-                    case black_PAWN:
-                    {
-                        return false;
-                        break;
-                    }
-                    default:
-                    {
-                        return true;
-                        break;
-                    }
-                }
-            }
+            return false;
         }
     }
+    else
+    {
+        return false;
+    }
 
-    return false;
+    return true;
 }
 
 bool checkTwoBlocksPawnMovement(int XInitial, int YInitial, int XFinal, int YFinal)
@@ -413,22 +980,25 @@ bool checkPawnMovement(const char *initialPosition, const char *finalPosition)
 
     int XFinalCoordinate = (finalPosition[1] - '0');
     int YFinalCoordinate = (finalPosition[0] - 'a') + 1;
-    
-    if(checkTwoBlocksPawnMovement(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, YFinalCoordinate))
+
+    if ( (XFinalCoordinate <= 8 && XFinalCoordinate >= 1) && (YFinalCoordinate <= 8 && YFinalCoordinate >= 1) )
     {
-        return true;
-    }
-    else
-    {
-        if(checkOneBlockPawnMovement(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, YFinalCoordinate))
+        if (checkTwoBlocksPawnMovement(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, YFinalCoordinate))
         {
             return true;
         }
         else
         {
-            if(attackPawn(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, YFinalCoordinate))
+            if (checkOneBlockPawnMovement(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, YFinalCoordinate))
             {
                 return true;
+            }
+            else
+            {
+                if (attackPawn(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, YFinalCoordinate))
+                {
+                    return true;
+                }
             }
         }
     }
