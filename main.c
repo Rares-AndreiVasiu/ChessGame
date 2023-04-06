@@ -69,7 +69,7 @@ void print_chess_board()
 	printf("\n");
 }
 
-//function for fun :))
+//function for fun
 void gamePlay()
 {
 	/*
