@@ -77,6 +77,8 @@ bool checkInitialPosition(const char *pos, const char *piceType, unsigned int mo
     check if a block from the board is empty
     returns true if board[i][j] == 0, false otherwise;
 */
+
+
 bool checkEmptyBlock(int i, int j)
 {
     if(chess_board[i][j] == 0)
@@ -98,7 +100,7 @@ bool checkNotAllay(int Xi, int Yi, int Xf, int Yf)
         int targetPiece = chess_board[Xf][Yf];
 
         if (targetPiece == black_PAWN || targetPiece == black_KNIGHT || targetPiece == black_BISHOP 
-        || targetPiece == black_ROOK || targetPiece == black_QUEEN || targetPiece == black_KING)
+        || targetPiece == black_ROOK || targetPiece == black_QUEEN)
         {
             return true;
         }
@@ -110,7 +112,7 @@ bool checkNotAllay(int Xi, int Yi, int Xf, int Yf)
         {
             int targetPiece = chess_board[Xf][Yf];
 
-            if (targetPiece == white_KNIGHT || targetPiece == white_KING || targetPiece == white_QUEEN 
+            if (targetPiece == white_KNIGHT || targetPiece == white_QUEEN 
             || targetPiece == white_ROOK || targetPiece == white_PAWN || targetPiece == white_BISHOP)
             {
                 return true;
@@ -121,18 +123,178 @@ bool checkNotAllay(int Xi, int Yi, int Xf, int Yf)
     return false;
 }
 
+bool checkRookQueen(int Xi, int Yi, int Xf, int Yf)
+{
+    int king = chess_board[Xi][Yi];
+
+    if(king == white_KING)
+    {
+        if(chess_board[Xf][Yf] == black_QUEEN || chess_board[Xf][Yf] == black_ROOK)
+        {
+            return true;
+        }
+    }
+    else
+    {
+        if(chess_board[Xf][Yf] == white_QUEEN || chess_board[Xf][Yf] == white_ROOK)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool checkQueenBishopPawn(int Xi, int Yi, int Xf, int Yf)
+{
+    int king = chess_board[Xi][Yi];
+
+    if(king == white_KING)
+    {
+        if(chess_board[Xf][Yf] == black_QUEEN || chess_board[Xf][Yf] == black_BISHOP)
+        {
+            return true;
+        }
+    }
+    else
+    {
+        if(chess_board[Xf][Yf] == white_QUEEN || chess_board[Xf][Yf] == white_BISHOP)
+        {
+            return true;
+        }
+    }
+
+    //we don't move on horiz or vertical
+
+    if(Xi != Xf && Yi != Yf && abs(Xi - Xf) == 1 && abs(Yi - Yf) == 1)
+    {
+        if(king == white_KING)
+        {
+            if(chess_board[Xf][Yf] == black_PAWN)
+            {
+                return true;
+            }
+        }
+        else
+        {
+            if(chess_board[Xf][Yf] == white_PAWN)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 /*
     function which checks if we get check mate
 */
 bool checkGameCheck(int Xi, int Yi, int Xf, int Yf)
 {
-    int targetBlock = chess_board[Xf][Yf];
+    bool checkMate = false;
 
-    //we check horrizontally for threats
-    if(Xi == Xf)
+    /*
+        we check for white enemies which can check us
+        we check horrizontally for threats
+    */
+
+    // we can either have queens or rooks
+
+    for (int j = 1; j < Yf; ++j)
     {
-
+        if (checkEmptyBlock(Xi, j) == false && checkRookQueen(Xi, Yi, Xf, Yf) == true)
+        {
+            checkMate = true;
+        }
     }
+
+    for (int j = Yf + 1; j <= 8; ++j)
+    {
+        if (checkEmptyBlock(Xi, j) == false && checkRookQueen(Xi, Yi, Xf, Yf) == true)
+        {
+            checkMate = true;
+        }
+    }
+
+    // we check for vertically queen and rook
+
+    for (int i = 1; i < Yf; ++i)
+    {
+        if (checkEmptyBlock(i, Yi) == false && checkRookQueen(Xi, Yi, Xf, Yf) == true)
+        {
+            checkMate = true;
+        }
+    }
+
+    for (int i = Yf + 1; i <= 8; ++i)
+    {
+        if (checkEmptyBlock(i, Yi) == false && checkRookQueen(Xi, Yi, Xf, Yf) == true)
+        {
+            checkMate = true;
+        }
+    }
+
+    // we check for diagonal: bishops and queen
+
+    int i = Xf - 1, j = Yf - 1;
+
+    // check firs diagonal
+    while (i >= 1 && j >= 1)
+    {
+        if (checkEmptyBlock(i, j) == false && checkQueenBishopPawn(Xi, Yi, i, j) == true)
+        {
+            checkMate = true;
+            break;
+        }
+
+        i--;
+
+        j--;
+    }
+
+    i = Xf - 1, j = Yf + 1;
+
+    while (i >= 1 && j <= 8)
+    {
+        if (checkEmptyBlock(i, j) == false && checkQueenBishopPawn(Xi, Yi, i, j) == true)
+        {
+            checkMate = true;
+            break;
+        }
+        i--;
+        
+        j++;
+    }
+
+    i = Xf + 1, j = Yf - 1;
+
+    while (i <= 8 && j >= 1)
+    {
+        if (checkEmptyBlock(i, j) == false && checkQueenBishopPawn(Xi, Yi, i, j) == true)
+        {
+            checkMate = true;
+            break;
+        }
+
+        i++;
+        j--;
+    }
+
+    i++;
+    j--;
+
+    i = Xf + 1, j = Yf + 1;
+
+    while (i <= 8 && j <= 8)
+    {
+        if (checkEmptyBlock(i, j) == false && checkQueenBishopPawn(Xi, Yi, i, j) == true)
+        {
+            checkMate = true;
+            break;
+        }
+        i++;
+        j++;
+    }
+
+    return checkMate;
 }
 
 //the following function checks if you can move the king to finPos
@@ -151,13 +313,25 @@ bool checkKingMovement(const char *initialPosition, const char *finalPosition)
     if( (XFinalCoordinate <= 8 && XFinalCoordinate >= 1) && (YFinalCoordinate <= 8 && YInitialCoordinate >= 1) &&
     abs(XInitialCoordinate - XFinalCoordinate) <= 1 && abs(YFinalCoordinate - YInitialCoordinate) <= 1)
     {
+        //if we have an allay on path its an invalid move
+        if(checkEmptyBlock(XFinalCoordinate, YFinalCoordinate) == false &&
+        checkNotAllay(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, YFinalCoordinate) == false) 
+        {
+            validKingMove = false;
+        }
 
+        //if free space but we step in check its invalid move
+        if(checkEmptyBlock(XFinalCoordinate, YFinalCoordinate) == true 
+        && checkGameCheck(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, YFinalCoordinate) == true)
+        {
+            validKingMove = false;
+        }
     }
     else
     {
         validKingMove = false;
     }
-
+    return validKingMove;
 }
 
 //the following function checks if you can move the queen to finPos
