@@ -1204,21 +1204,24 @@ bool checkKnightMovement(const char *initialPosition, const char *finalPosition)
     int XFinalCoordinate = (finalPosition[1] - '0');
     int YFinalCoordinate = (finalPosition[0] - 'a') + 1;
 
-    if ( (XFinalCoordinate <= 8 && XFinalCoordinate >= 1) && (YFinalCoordinate <= 8 && YInitialCoordinate >= 1) 
-        && ( ( ( abs(XInitialCoordinate - XFinalCoordinate) == 1) && ( abs(YFinalCoordinate - YInitialCoordinate) == 2)) 
-        || ( ( abs(XFinalCoordinate - XInitialCoordinate) == 2) && ( abs(YFinalCoordinate - YInitialCoordinate) == 1)) ) )
+    if( (XFinalCoordinate <= 8 && XFinalCoordinate >= 1)
+     && (YFinalCoordinate <= 8 && YFinalCoordinate >= 1) 
+     && ( ((abs(XInitialCoordinate - XFinalCoordinate) == 1) && (abs(YFinalCoordinate - YInitialCoordinate) == 2)) 
+     || ((abs(XFinalCoordinate - XInitialCoordinate) == 2) && (abs(YFinalCoordinate - YInitialCoordinate) == 1)) ) )
     {
-        if(checkEmptyBlock(XFinalCoordinate, YFinalCoordinate) == false && checkNotAllay(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, YFinalCoordinate) == false)
+        if (checkEmptyBlock(XFinalCoordinate, YFinalCoordinate))
         {
-            return false;
+            return true;
+        }
+
+        if (checkEmptyBlock(XFinalCoordinate, YFinalCoordinate) == false &&
+            checkNotAllay(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, YFinalCoordinate) == true)
+        {
+            return true;
         }
     }
-    else
-    {
-        return false;
-    }
 
-    return true;
+    return false;
 }
 
 bool checkTwoBlocksPawnMovement(int XInitial, int YInitial, int XFinal, int YFinal)
