@@ -3,7 +3,6 @@
 	chess game
 	its divided in separate stages
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
