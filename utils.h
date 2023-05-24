@@ -36,7 +36,6 @@ void initBoard()
 	/*
 		chess chess_board initialization
 	*/
-
 	chess_board[1][1] = black_ROOK;
 
 	chess_board[1][2] = black_KNIGHT;
