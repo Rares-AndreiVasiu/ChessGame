@@ -1,6 +1,5 @@
 #ifndef CHESS // if not defined the chess pieces we define it
 #define CHESS
-
 /*
     here we declare all the chess pieces 
     and block squres to display
