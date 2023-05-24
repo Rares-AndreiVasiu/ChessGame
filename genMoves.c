@@ -9,6 +9,8 @@ typedef struct _node
     int YFinal;
 
     int step;
+
+    int score;
     struct _node *next;
 
 } node;
@@ -26,15 +28,17 @@ node *create_node(int xi, int yi, int xf, int yf, int movement)
         exit(0);
     }
 
-    p->XInitial = xi;
+    p -> XInitial = xi;
 
-    p->YInitial = yi;
+    p -> YInitial = yi;
 
-    p->XFinal = xf;
+    p -> XFinal = xf;
 
-    p->YFinal = yf;
+    p -> YFinal = yf;
 
-    p->step = movement;
+    p -> step = movement;
+
+    p -> score = 0;// we set the score to 0 because we will calculate it later
 
     return p;
 }
@@ -54,8 +58,8 @@ void print()
         for (current = head; current != NULL; current = current->next)
         {
             index ++;
-            printf("%d) Xi coord: %d, Yi coord: %d, Xf coord: %d, Yf coord: %d, steps: %d\n",index,
-                   current->XInitial, current->YInitial, current->XFinal, current->YFinal, current->step);
+            printf( "%d) Xi coord: %d, Yi coord: %d, Xf coord: %d, Yf coord: %d, mobility: %d, score: %d\n",index,
+                   current->XInitial, current->YInitial, current->XFinal, current->YFinal, current->step, current ->score);
         }
     }
 }
@@ -96,6 +100,28 @@ void delete()
     tail = NULL;
 }
 
+bool checkExistingPieceMovement(int x, int y)
+{
+    node *current;
+
+    if (head == NULL)
+    {
+        printf("Empty list!\n");
+    }
+    else
+    {
+        for (current = head; current != NULL; current = current->next)
+        {
+            if(current -> XInitial == x && current -> YInitial == y)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 bool checkIsWhitePiece(int x, int y)
 {
     int piece = chess_board[x][y];
@@ -120,6 +146,26 @@ void initPawnsStatus()
     }
 }
 
+void setMobility(int x, int y, int mobilty)
+{
+    node *current;
+
+    if (head == NULL)
+    {
+        printf("Empty list!\n");
+    }
+    else
+    {
+        for (current = head; current != NULL; current = current->next)
+        {
+            if(current -> XInitial == x && current -> YInitial == y)
+            {
+                current -> step = mobilty;
+            }
+        }
+    }
+}
+
 void printPossibleMove(int Xi, int Yi, int Xf, int Yf)
 {
     printf("Start pos: %d %d, End pos: %d %d\n", Xi, Yi, Xf, Yf);
@@ -140,14 +186,14 @@ void generatePawnMoves(int x, int y)
         {
             finalMoveX = x - 2;
             finalMoveY = y;
-            whitePawnsStatus[y] = finalMoveX;
 
             // at each new move we add to the moves list to store them
-            node *newNode = create_node(x, y, finalMoveX, finalMoveY, 2);
+            node *newNode = create_node(x, y, finalMoveX, finalMoveY, 1);
 
             add_to_back(newNode);
 
-            printPossibleMove(x, y, finalMoveX, finalMoveY);
+            // whitePawnsStatus[y] = finalMoveX;
+
         }
 
         // or if we want to move only one block up
@@ -160,9 +206,9 @@ void generatePawnMoves(int x, int y)
 
             add_to_back(newNode);
 
-            whitePawnsStatus[y] = finalMoveX;
+            // whitePawnsStatus[y] = finalMoveX;
 
-            printPossibleMove(x, y, finalMoveX, finalMoveY);
+            // printPossibleMove(x, y, finalMoveX, finalMoveY);
         }
         else
         {
@@ -177,9 +223,9 @@ void generatePawnMoves(int x, int y)
 
                 add_to_back(newNode);
 
-                whitePawnsStatus[y] = finalMoveX;
+                // whitePawnsStatus[y] = finalMoveX;
 
-                printPossibleMove(x, y, finalMoveX, finalMoveY);
+                // printPossibleMove(x, y, finalMoveX, finalMoveY);
             }
             else
             {
@@ -188,13 +234,13 @@ void generatePawnMoves(int x, int y)
 
                 if (attackPawn(x, y, finalMoveX, finalMoveY))
                 {
-                    whitePawnsStatus[y] = finalMoveX;
-
                     node *newNode = create_node(x, y, finalMoveX, finalMoveY, 1);
 
                     add_to_back(newNode);
 
-                    printPossibleMove(x, y, finalMoveX, finalMoveY);
+                    // whitePawnsStatus[y] = finalMoveX;
+
+                    // printPossibleMove(x, y, finalMoveX, finalMoveY);
                 }
             }
         }
@@ -211,9 +257,9 @@ void generatePawnMoves(int x, int y)
 
             add_to_back(newNode);
 
-            whitePawnsStatus[y] = finalMoveX;
+            // whitePawnsStatus[y] = finalMoveX;
 
-            printPossibleMove(x, y, finalMoveX, finalMoveY);
+            // printPossibleMove(x, y, finalMoveX, finalMoveY);
         }
         else
         {
@@ -228,7 +274,7 @@ void generatePawnMoves(int x, int y)
 
                 add_to_back(newNode);
 
-                whitePawnsStatus[y] = finalMoveX;
+                // whitePawnsStatus[y] = finalMoveX;
 
                 printPossibleMove(x, y, finalMoveX, finalMoveY);
             }
@@ -239,7 +285,7 @@ void generatePawnMoves(int x, int y)
 
                 if (attackPawn(x, y, finalMoveX, finalMoveY))
                 {
-                    whitePawnsStatus[y] = finalMoveX;
+                    // whitePawnsStatus[y] = finalMoveX;
 
                     node *newNode = create_node(x, y, finalMoveX, finalMoveY, 1);
 
@@ -943,6 +989,110 @@ void handlePieceType(int x, int y)
     }
 }
 
+int getPieceScore(int x, int y)
+{
+    int piece = chess_board[x][y];
+
+    // since we play by white
+    // black pieces are the enemies
+    switch (piece)
+    {
+        case black_KING:
+        {
+            return 200;
+
+            break;
+        }
+
+        case black_QUEEN:
+        {
+            return 9;
+
+            break;
+        }
+
+        case black_ROOK:
+        {
+            return 5;
+
+            break;
+        }
+
+        case black_BISHOP:
+        {
+            return 3;
+
+            break;
+        }
+
+        case black_KNIGHT:
+        {
+            return 2;
+
+            break;
+        }
+
+        case black_PAWN:
+        {
+            return 1;
+
+            break;
+        }
+    }
+}
+
+int getMobility(int i, int j)
+{
+    int mobility = 0;
+
+    node *current;
+
+    if (head == NULL)
+    {
+        printf("Empty list!\n");
+    }
+    else
+    {
+        for (current = head; current != NULL; current = current->next)
+        {
+            if(current -> XInitial == i && current -> YInitial == j)
+            {
+                mobility++;
+            }
+        }
+    }
+
+    return mobility;
+}
+
+void setScore()
+{
+    node *current;
+
+    if(head == NULL)
+    {
+        printf("Empty list\n");
+    }
+    else
+    {
+        for(current = head; current != NULL; current = current -> next)
+        {
+            // we check if we step on the enemy
+            // then we make up the score 
+            if(checkEmptyBlock(current -> XFinal, current ->YFinal) == false && checkNotAllay(current->XInitial, current->YInitial, current->XFinal, current->YFinal) == true)
+            {
+                printf("This piece performs a massive attack: (%d, %d) to (%d, %d)\n", current ->XInitial, current ->YInitial, current->XFinal, current ->YFinal);
+                current ->score += current -> step + getPieceScore(current -> XFinal, current -> YFinal);
+            }
+            else
+            {
+                //if free to move on the block
+
+                current -> score += current -> step;
+            }
+        }
+    }
+}
 
 void movementComputer()
 {
@@ -955,9 +1105,14 @@ void movementComputer()
             if (checkIsWhitePiece(i, j))
             {
                 handlePieceType(i, j);
+
+                int mobility = getMobility(i, j);
+
+                setMobility(i, j, mobility);
             }
         }
     }
+    setScore();
 
     print();
 
@@ -992,6 +1147,10 @@ void movementComputer()
 
         printf("THE BEST OPTIONS IS: %d %d %d %d\n", XInitialCoordinate, YInitialCoordinate,XFinalCoordinate, YFinalCoordinate);
         
+        if(chess_board[XInitialCoordinate][YInitialCoordinate] == white_PAWN)
+        {
+            whitePawnsStatus[YInitialCoordinate] = YFinalCoordinate;
+        }
         //now we have stored the best move and make it real
         makeMoveOnBoard(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, YFinalCoordinate);
 
