@@ -18,6 +18,7 @@ bool endOfTheLine;
 #include "checkMoves.h"
 #include "genMoves.c"
 #include "utils.h"
+// #include "load.c"
 
 char option[10];
 
@@ -73,7 +74,6 @@ void print_chess_board()
 		printf(" %c", 'a' + j);
 	printf("\n");
 }
-
 
 //function for fun
 void multiplayer()
