@@ -63,7 +63,7 @@ void print()
             printf( "%d) Xi coord: %d, Yi coord: %d, Xf coord: %d, Yf coord: %d, mobility: %d, score: %f\n",index,
                    current->XInitial, current->YInitial, current->XFinal, current->YFinal, current->step, current ->score);
 
-            printf("Piece counter: %f\n",pieceCounter(current->XFinal, current->YFinal));
+            //printf("Piece counter: %f\n",pieceCounter(current->XFinal, current->YFinal));
         }
     }
 }
