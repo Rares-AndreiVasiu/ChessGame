@@ -47,7 +47,6 @@ int selectPieceType(const char *piceType, int movement)
     }
     return -1;
 }
-
 /*
     in pos we have the initial position
     in pieceType we got: Knight, King, Queen, Bishop, Rook, Pawn
