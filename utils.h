@@ -1,4 +1,4 @@
-#ifndef CHESS // if not defined the chess pieces we define it
+#ifndef CHESS 
 #define CHESS
 /*
 	here we declare all the chess pieces
