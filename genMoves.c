@@ -1,5 +1,4 @@
 #include "utils.h"
-
 typedef struct _node
 {
     int XInitial;
