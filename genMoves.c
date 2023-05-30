@@ -1,4 +1,5 @@
 #include "utils.h"
+
 typedef struct _node
 {
     int XInitial;
@@ -2451,7 +2452,6 @@ void movementComputer()
         }
         //now we have stored the best move and make it real
         makeMoveOnBoard(XInitialCoordinate, YInitialCoordinate, XFinalCoordinate, YFinalCoordinate);
-
         delete();
     }
 }
