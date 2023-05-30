@@ -1,7 +1,7 @@
 /*
-This code is a simulation of the real life
-chess game
-is divided in separate stages
+	This code is a simulation of the real life
+	chess game
+	its divided in separate stages
 */
 #include <stdio.h>
 #include <stdlib.h>
